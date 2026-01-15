@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACCOUNTANT</title>
+    <link rel="stylesheet" href="Css/style.css">
+    <!-- مكتبة jsPDF الأساسية -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- مكتبة jsPDF AutoTable لرسم الجداول -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <!-- بمجرد إضافة هذه الروابط في ملف HTML، سيعمل زر "Download PDF Report" الذي أضفته لك في نظام إدارة المنتجات وسيقوم بتحميل تقرير منظم بجميع البيانات المسجلة. -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+</head>
+
+<body>
+    <div class="crud">
+        <div class="head">
+            <h2>ACCOUNTANT</h2>
+            <p>PRODUCT MANAGEMENT SYSTEM</p>
+        </div>
+
+        <nav class="navbar" style="display: flex; justify-content: center; margin-bottom: 20px;">
+            <button onclick="showSection('inputSection')" id="navInputBtn"
+                style="width: 150px; margin: 5px;">Input</button>
+            <button onclick="showSection('outputSection')" id="navOutputBtn"
+                style="width: 150px; margin: 5px;">Output</button>
+        </nav>
+
+        <div id="inputSection">
+            <div class="input">
+                <input type="text" id="title" placeholder="Title">
+                <div class="price">
+                    <input type="number" id="price" placeholder="Price" onkeyup="getTotal()">
+                    <input type="number" id="taxes" placeholder="taxes" onkeyup="getTotal()">
+                    <input type="number" id="ads" placeholder="Ads" onkeyup="getTotal()">
+                    <input type="number" id="discount" placeholder="Discount" onkeyup="getTotal()">
+                    <small id="total"></small>
+                </div>
+                <input type="number" id="count" placeholder="Count">
+                <input type="text" id="category" placeholder="Category">
+                <button id="submit">Create</button>
+            </div>
+
+            <div class="output">
+                <div class="searchBlock">
+                    <input type="text" id="search" placeholder="Search" onkeyup="searchData(this.value)">
+                    <div class="btnSearch">
+                        <button id="searchTitle" onclick="getSearchMood(this.id)">Search By Title</button>
+                        <button id="searchCategory" onclick="getSearchMood(this.id)">Search By Category</button>
+                    </div>
+                </div>
+                <div id="deleteAll"></div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>title</th>
+                            <th>price</th>
+                            <th>taxes</th>
+                            <th>ads</th>
+                            <th>discount</th>
+                            <th>total</th>
+                            <th>category</th>
+                            <th>Date</th>
+                            <th>update</th>
+                            <th>delete</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+        </div>
+        <!-- This is outPut  -->
+        <div id="outputSection" style="display: none;">
+            <div class="input">
+                <input type="text" id="name" placeholder="الاســـــــم">
+                <input type="number" id="amunt" placeholder="المبـــــــلغ">
+                <input type="details" id="detail" placeholder="التفاصـــــيل">
+                <button id="submit out">SAVE</button>
+            </div>
+
+            <div class="output">
+                <div id="removeAll"></div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>name</th>
+                            <th>amunt</th>
+                            <th>detail</th>
+                            <th>total</th>
+                            <th>Date</th>
+                            <th>update</th>
+                            <th>delete</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="javaScript/main.js"></script>
+</body>
+
+</html>

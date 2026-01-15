@@ -1,0 +1,159 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #222;
+    color: #fff;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+
+}
+
+.crud {
+    width: 80%;
+    margin: auto;
+}
+
+.head {
+    text-align: center;
+    text-transform: uppercase;
+    margin: 10px 0;
+}
+
+input {
+    width: 100%;
+    height: 30px;
+    outline: none;
+    border: none;
+    background-color: #111;
+    margin: 4px;
+    border-radius: 4px;
+    padding: 4px;
+    color: #fff;
+}
+
+input:focus {
+    background-color: #000;
+    transform: scale(1.1);
+}
+
+.price input {
+    width: 20%;
+}
+
+#total {
+    background-color: rgb(236, 161, 9);
+    padding: 5px 2px;
+    border-radius: 4px;
+}
+
+#total::before {
+    content: "Total=>";
+}
+
+button {
+    width: 100%;
+    height: 30px;
+    border: none;
+    background-color: rgb(167, 158, 121);
+    border-radius: 4px;
+    cursor: pointer;
+    color: darkred;
+    font-weight: bold;
+    transition: 0.5s;
+}
+
+button:hover {
+    background-color: #fcf9f9;
+    letter-spacing: 1px;
+}
+
+.btnSearch {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btnSearch button {
+    width: 45%;
+}
+
+#deleteAll {
+    margin: 20px 0;
+}
+
+table {
+    width: 100%;
+    text-align: center;
+    margin: 10px 0;
+}
+
+table th {
+    text-transform: uppercase;
+}
+
+th,
+td {
+    padding: 5px;
+}
+
+/* أضف هذه الأكواد إلى نهاية ملف style.css */
+
+.navbar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 15px;
+}
+
+.navbar button {
+    width: 150px;
+    background-color: #333;
+    color: white;
+    border: 1px solid rgb(167, 158, 121);
+}
+
+.navbar button:hover {
+    background-color: rgb(167, 158, 121);
+    color: darkred;
+}
+
+/***************************output and input******************
+/* نمط للزر النشط */
+/* .navbar button.active {
+    background-color: rgb(167, 158, 121);
+    color: darkred;
+    box-shadow: 0 0 10px rgba(167, 158, 121, 0.5);
+} */
+
+/* .main-section {
+    transition: 0.5s;
+} */
+
+/* لضمان تجاوب الجدول في الشاشات الصغيرة */
+/* .output {
+    overflow-x: auto;
+} */
+/* تنسيق أزرار التنقل لتناسب الطابع العام */
+.navbar button {
+    cursor: pointer;
+    background-color: #333;
+    color: white;
+    border: none;
+    height: 40px;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.navbar button:hover {
+    background-color: #147cf3;
+    letter-spacing: 1px;
+}
+
+div #removeAll {
+    margin: 1px;
+}
+
+/* /////////////////////// */
