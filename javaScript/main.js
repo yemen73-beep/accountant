@@ -489,7 +489,7 @@ function showOutData() {
   // إظهار زر حذف الكل إذا وجد بيانات
   if (outDataPro.length > 0) {
     outremoveAllBtn.innerHTML = `
-    <button onclick="exportOutToPDF()" style="background-color: #d09228; margin-top: 10px;">Download (${outDataPro.length})</button>
+    <button onclick="exportOutToPDF()" style="background-color: #d09228; margin-top: 10px;">Download PDF Report</button>
     <button onclick="removeAllOut()" style="background-color: #e76161ff; margin-top: 10px;">Delete All (${outDataPro.length})</button>
         `;
   } else {
