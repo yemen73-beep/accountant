@@ -51,14 +51,6 @@ submit.onclick = function () {
         hour12: true, // اجعلها false إذا كنت تريد نظام 24 ساعة
       })
       .replace(/(\d+)\/(\d+)\/(\d+),/, "$3/$2/$1"),
-
-    // Date: new Date().toLocaleString("en-GB",{
-    //   year: "numeric",
-    //   month: "numeric",
-    //   day: "numeric",
-    //   hour: "2-digit",
-    //   minute: "2-digit"
-    // })
   };
   if (
     newPro.title != "" &&
@@ -223,7 +215,7 @@ function exportToPDF() {
             </table>
             
             <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #aaa; border-top: 1px solid #eee; padding-top: 10px;">
-                <p>البرطي - سجل المبيعات اليومي</p>
+                <p>Eng.Al-ParatY_770049491</p>
             </div>
         </div>
     `;
@@ -338,44 +330,6 @@ function searchData(value) {
   document.getElementById("tbody").innerHTML = table;
 }
 ////////////////Input AND OUTPUT///////////
-// وظيفة التنقل بين الأقسام
-// function showSection(sectionId) {
-//     // إخفاء جميع الأقسام
-//     document.getElementById('inputSection').style.display = 'none';
-//     document.getElementById('outputSection').style.display = 'none';
-
-//     // إظهار القسم المطلوب
-//     document.getElementById(sectionId).style.display = 'block';
-
-//     // تغيير شكل الأزرار
-//     document.getElementById('navInputBtn').classList.remove('active');
-//     document.getElementById('navOutputBtn').classList.remove('active');
-
-//     if(sectionId === 'inputSection') {
-//         document.getElementById('navInputBtn').classList.add('active');
-//     } else {
-//         document.getElementById('navOutputBtn').classList.add('active');
-//     }
-// }
-
-// function showSection(sectionId) {
-//     // إخفاء كل الأقسام
-//     document.getElementById('inputSection').style.display = 'none';
-//     document.getElementById('outputSection').style.display = 'none';
-
-//     // إظهار القسم المختار
-//     document.getElementById(sectionId).style.display = 'block';
-
-//     // تحديث شكل أزرار التنقل
-//     document.getElementById('navInputBtn').classList.toggle('active', sectionId === 'inputSection');
-//     document.getElementById('navOutputBtn').classList.toggle('active', sectionId === 'outputSection');
-// }
-
-// التأكد من تشغيل Input كواجهة أساسية تحتوي على كل الحقول عند فتح الصفحة
-// window.onload = function() {
-//     showSection('inputSection');
-//     showData(); // عرض الجدول داخل قسم Input
-// }
 
 // وظيفة التبديل بين القائمة والصفحة الفارغة
 function showSection(sectionId) {
@@ -543,11 +497,7 @@ function exportOutToPDF() {
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     
-    // let hours = now.getHours();
-    // const minutes = String(now.getMinutes()).padStart(2, '0');
-    // const ampm = hours >= 12 ? 'PM' : 'AM';
-    // hours = hours % 12;
-    // hours = hours ? hours : 12; 
+    
 
   // تنسيق الوقت (12 ساعة مع AM/PM)
   let hours = now.getHours();
@@ -621,7 +571,7 @@ function exportOutToPDF() {
             </table>
             
             <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #aaa; border-top: 1px solid #eee; padding-top: 10px;">
-                <p>البرطي- سجل المخرجات</p>
+                <p>Eng.Al-ParatY_770049491</p>
             </div>
         </div>
     `;
@@ -633,6 +583,270 @@ function exportOutToPDF() {
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+
+/***********************************************************************************************************
+ * ************************************************ Debts **************************************************
+ * ******************************************************************************************************* */
+// --- الجزء الخاص بإدارة الأقسام (Show/Hide) ---
+// 1. تعريف مصفوفة البيانات (تحميل من المتصفح أو إنشاء مصفوفة فارغة)
+let debtors = JSON.parse(localStorage.getItem('debtors_data')) || [];
+let currentDebtorIndex = null;
+
+// 2. دالة عرض قائمة المديونين في الجدول الرئيسي
+function renderDebtors() {
+    const tbody = document.getElementById("debtorsTableBody");
+    tbody.innerHTML = "";
+    
+    debtors.forEach((debtor, index) => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${debtor.name}</td>
+                <td>${debtor.phone}</td>
+                <td>
+                    <button class="btn-view" onclick="openStatement(${index})" style="background: #3498db; color: white; padding: 20px 10px; border-radius: 35px; border: none; cursor: pointer;">فتح الكشف</button>
+                    <button onclick="deleteDebtor(${index})" style="background: #e74c3c; color: white; padding: 5px 10px; border-radius: 20px; border: none; cursor: pointer; margin-right: 5px;">حذف</button>
+                </td>
+            </tr>
+        `;
+    });
+    // حفظ البيانات في الذاكرة المحلية عند كل تحديث
+    localStorage.setItem('debtors_data', JSON.stringify(debtors));
+}
+
+// 3. دالة إضافة مديون جديد
+function addDebtor() {
+    const nameInput = document.getElementById("debtorName");
+    const phoneInput = document.getElementById("debtorPhone");
+
+    if (nameInput.value.trim() !== "" && phoneInput.value.trim() !== "") {
+        debtors.push({
+            name: nameInput.value,
+            phone: phoneInput.value,
+            entries: []
+        });
+        renderDebtors();
+        nameInput.value = "";
+        phoneInput.value = "";
+    } else {
+        alert("الرجاء إدخال الاسم ورقم الجوال");
+    }
+}
+
+// 4. دالة فتح كشف الحساب (النافذة المنبثقة)
+function openStatement(index) {
+    currentDebtorIndex = index;
+    const debtor = debtors[index];
+    document.getElementById("modalTitle").innerText = `كشف حساب: ${debtor.name}`;
+    document.getElementById("debtDate").value = new Date().toISOString().split('T')[0];
+    renderEntries();
+    document.getElementById("statementModal").style.display = "block";
+}
+
+// 5. تعديل دالة إضافة العملية
+function addEntry() {
+    const descInput = document.getElementById("debtDesc");
+    const amountInput = document.getElementById("debtAmount");
+    const typeInput = document.getElementById("debtType");
+    const dateInput = document.getElementById("debtDate");
+
+    // جلب الوقت الحالي بتنسيق (ساعة:دقيقة)
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: true 
+    });
+
+    if (descInput.value && amountInput.value) {
+        debtors[currentDebtorIndex].entries.push({
+            desc: descInput.value,
+            amount: parseFloat(amountInput.value),
+            type: typeInput.value,
+            date: dateInput.value,
+            time: timeString // إضافة الوقت هنا
+        });
+        
+        renderEntries();
+        renderDebtors();
+        
+        descInput.value = "";
+        amountInput.value = "";
+        dateInput.value = new Date().toISOString().split('T')[0]; 
+    } else {
+        alert("الرجاء إدخال الوصف والمبلغ");
+    }
+}
+
+// 6. تعديل دالة عرض العمليات وحساب الإجمالي الصافي
+function renderEntries() {
+    const entriesBody = document.getElementById("entriesBody");
+    const totalDisplay = document.getElementById("totalAmount");
+    entriesBody.innerHTML = "";
+    let netTotal = 0;
+
+    const entries = debtors[currentDebtorIndex].entries;
+    entries.forEach((entry, entryIndex) => {
+        if (entry.type === "عليه") { netTotal += entry.amount; } 
+        else { netTotal -= entry.amount; }
+
+        const typeIcon = entry.type === "عليه" ? "🔺" : "🟢";
+        const typeColor = entry.type === "عليه" ? "#e74c3c" : "#2ecc71";
+
+        entriesBody.innerHTML += `
+            <tr>
+                <td>${entry.desc}</td>
+                <td style="color: ${typeColor}; font-weight: bold;">
+                    ${typeIcon} ${entry.amount}
+                </td>
+                <td>
+                    <div style="font-size: 13px;">${entry.date}</div>
+                    <div style="font-size: 11px; color: #aaa;">${entry.time || ''}</div>
+                </td>
+                <td>
+                    <button onclick="deleteEntry(${entryIndex})" style="background:none; border:none; cursor:pointer;">❌</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    totalDisplay.innerText = netTotal;
+}
+// 7. دالة حذف مديون (اختيارية لكنها مهمة)
+function deleteDebtor(index) {
+    if (confirm("هل أنت متأكد من حذف هذا المديون نهائياً؟")) {
+        debtors.splice(index, 1);
+        renderDebtors();
+    }
+}
+
+// 8. دالة إغلاق النافذة المنبثقة
+function closeModal() {
+    document.getElementById("statementModal").style.display = "none";
+
+}
+
+// 9. دالة التنقل بين الأقسام (Show Section)
+function showSection(sectionId) {
+    // إخفاء كل السكاشن (أضف هنا أي ID سكشن آخر لديك)
+    const sections = ['inputSection', 'outputSection', 'debtsSection'];
+    sections.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.style.display = 'none';
+    });
+    
+    // إظهار السكشن المطلوب
+    document.getElementById(sectionId).style.display = 'block';
+}
+
+// تحميل البيانات عند تشغيل الصفحة لأول مرة
+renderDebtors();
+
+// 10. حذف السجل من كشف الحساب
+function deleteEntry(entryIndex) {
+    if (confirm("هل أنت متأكد من حذف هذه العملية؟")) {
+        // حذف السجل المحدد من مصفوفة العمليات الخاصة بهذا المديون
+        debtors[currentDebtorIndex].entries.splice(entryIndex, 1);
+        
+        // تحديث العرض والحفظ
+        renderEntries();
+        renderDebtors();
+    }
+}
+
+// 11. تنزيل pdf
+function exportDebtorToPDF() {
+    if (typeof html2pdf === 'undefined') {
+        alert("عذراً، مكتبة PDF غير محملة");
+        return;
+    }
+
+    if (currentDebtorIndex === null) return;
+
+    const debtor = debtors[currentDebtorIndex];
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
+    
+    const fileName = `${debtor.name}_كشف_حساب_${formattedDate}.pdf`;
+
+    // 1. بناء صفوف الجدول وحساب الإجمالي الصافي
+    let totalAmount = 0; 
+    let tableBodyHtml = "";
+
+    debtor.entries.forEach((item, index) => {
+        const amount = Number(item.amount) || 0;
+
+        // الحساب: إذا كان "عليه" نجمع، وإذا كان "له" نطرح
+        if (item.type === 'عليه') {
+            totalAmount += amount;
+        } else {
+            totalAmount -= amount;
+        }
+
+        tableBodyHtml += `
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${index + 1}</td>
+                <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">${item.desc}</td>
+                <td style="padding: 10px; text-align: center; border: 1px solid #ddd; color: ${item.type === 'عليه' ? '#d32f2f' : '#2e7d32'};">
+                    ${item.type === 'عليه' ? '🔺' : '🟢'} ${amount.toFixed(2)}
+                </td>
+                <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">
+                    <div style="font-size: 10px;">${item.date}</div>
+                    <div style="font-size: 9px; color: #777;">${item.time || ''}</div>
+                </td>
+            </tr>
+        `;
+    });
+
+    // 2. إنشاء تصميم التقرير
+    const element = document.createElement('div');
+    element.innerHTML = `
+        <div dir="rtl" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; background: white;">
+            <div style="text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 20px; margin-bottom: 20px;">
+                <h1 style="color: #3498db; margin: 0;">كشف حساب مديونية</h1>
+                <h3 style="margin: 10px 0;"> ${debtor.name}</h3>
+                <p style="color: #666; margin: 5px 0;"> ${debtor.phone}</p>
+                <p style="color: #888; margin: 5px 0; font-size: 12px;">تاريخ التقرير${formattedDate}</p>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; direction: rtl;">
+                <thead>
+                    <tr style="background-color: #34495e; color: white;">
+                        <th style="padding: 12px; border: 1px solid #222; width: 40px;">#</th>
+                        <th style="padding: 12px; border: 1px solid #222;">الوصف</th>
+                        <th style="padding: 12px; border: 1px solid #222;">المبلغ</th>
+                        <th style="padding: 12px; border: 1px solid #222;">التاريخ والوقت</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableBodyHtml}
+                </tbody>
+                <tfoot>
+                    <tr style="background-color: #f1f1f1; font-weight: bold;">
+                        <td colspan="2" style="padding: 15px; border: 1px solid #ddd; text-align: left;">إجمالي المديونية المتبقية</td>
+                        <td colspan="2" style="padding: 15px; border: 1px solid #ddd; text-align: center; color: ${totalAmount >= 0 ? '#d32f2f' : '#2e7d32'}; font-size: 18px;">
+                            ${totalAmount.toFixed(2)}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #aaa; border-top: 1px solid #eee; padding-top: 10px;">
+                <p>Eng.Al-ParatY_770049491</p>
+            </div>
+        </div>
+    `;
+
+    // 3. إعدادات التصدير
+    const opt = {
+        margin: [10, 10, 10, 10],
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     html2pdf().set(opt).from(element).save();
