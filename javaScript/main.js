@@ -111,8 +111,8 @@ function showData() {
             <td><small style="color: #fff; font-size: 12px; display: black; margin-top: 5px;">
             🕒 ${dataPro[i].Date ? dataPro[i].Date : "UNKNOWN"}
             </small></td>
-            <td><button id="update" onclick = "updateData(${i})">update</button></td>
-            <td><button onclick = "deleteData(${i})" id="delete">delete</button></td>
+            <td><button id="update" onclick = "updateData(${i})">تعديل</button></td>
+            <td><button onclick = "deleteData(${i})" id="delete">حذف</button></td>
         </tr> `;
   }
   document.getElementById("tbody").innerHTML = table;
@@ -120,9 +120,9 @@ function showData() {
   let btnDelete = document.getElementById("deleteAll");
   if (dataPro.length > 0) {
     btnDelete.innerHTML = `
-        <button onclick = "deleteAll()">DeleteAll (${dataPro.length})</button>
+        <button onclick = "deleteAll()">حذف كل السجلات (${dataPro.length})</button>
         <button onclick="exportToPDF()" style="background-color: #e91e63; margin-top: 10px;">
-        Download PDF Report</button>`;
+        تحميل السجلات PDF</button>`;
   } else {
     btnDelete.innerHTML = " ";
   }
@@ -236,9 +236,11 @@ function exportToPDF() {
 // Delete
 
 function deleteData(i) {
-  dataPro.splice(i, 1);
-  localStorage.productf = JSON.stringify(dataPro);
-  showData();
+    if (confirm("هل تريد حذف السجل هذا؟")) {
+        dataPro.splice(i, 1);
+        localStorage.productf = JSON.stringify(dataPro);
+        showData();
+    }
 }
 
 // DeleteAll
@@ -305,8 +307,8 @@ function searchData(value) {
           <td>${dataPro[i].discount}</td>
           <td>${dataPro[i].total}</td>
           <td>${dataPro[i].category}</td>
-            <td><button id="update" onclick = "updateData(${i})">update</button></td>
-            <td><button onclick = "deleteData(${i})" id="delete">delete</button></td>
+            <td><button id="update" onclick = "updateData(${i})">تعديل</button></td>
+            <td><button onclick = "deleteData(${i})" id="delete">حذف</button></td>
             </tr> `;
       }
     } else {
@@ -443,8 +445,8 @@ function showOutData() {
   // إظهار زر حذف الكل إذا وجد بيانات
   if (outDataPro.length > 0) {
     outremoveAllBtn.innerHTML = `
-    <button onclick="exportOutToPDF()" style="background-color: #d09228; margin-top: 10px;">Download PDF Report</button>
-    <button onclick="removeAllOut()" style="background-color: #e76161ff; margin-top: 10px;">Delete All (${outDataPro.length})</button>
+    <button onclick="exportOutToPDF()" style="background-color: #d09228; margin-top: 10px;">تحميل السجلات PDF</button>
+    <button onclick="removeAllOut()" style="background-color: #e76161ff; margin-top: 10px;">حذف كل السجلات (${outDataPro.length})</button>
         `;
   } else {
     outremoveAllBtn.innerHTML = "";
@@ -453,9 +455,11 @@ function showOutData() {
 
 // 4. حذف عنصر واحد
 function deleteOutData(i) {
-  outDataPro.splice(i, 1);
-  localStorage.outProduct = JSON.stringify(outDataPro);
-  showOutData();
+    if (confirm("هل تريد حذف السجل هذا؟")) {
+        outDataPro.splice(i, 1);
+        localStorage.outProduct = JSON.stringify(outDataPro);
+        showOutData();
+    }
 }
 
 // 5. حذف الكل
