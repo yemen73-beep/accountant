@@ -1,13 +1,14 @@
+/* --- الإعدادات العامة --- */
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box; /* لضمان دقة المقاسات */
 }
 
 body {
     background-color: #222;
     color: #fff;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-
 }
 
 .crud {
@@ -21,6 +22,7 @@ body {
     margin: 10px 0;
 }
 
+/* --- المدخلات (Inputs) --- */
 input {
     width: 100%;
     height: 30px;
@@ -53,6 +55,11 @@ input:focus {
     content: "Total=>";
 }
 
+#debtDate {
+    color: #4d4b4b;
+}
+
+/* --- الأزرار (Buttons) --- */
 button {
     width: 100%;
     height: 30px;
@@ -79,34 +86,11 @@ button:hover {
     width: 45%;
 }
 
-#deleteAll {
+#deleteAll, #removeAll {
     margin: 20px 0;
 }
 
-table {
-    width: 100%;
-    text-align: center;
-    margin: 10px 0;
-}
-
-table th {
-    text-transform: uppercase;
-}
-
-th,
-td {
-    padding: 5px;
-}
-.table-wrapper {
-    width: 100%;
-    overflow-x: auto; /* يسمح بالتمرير الأفقي */
-    -webkit-overflow-scrolling: touch;
-    margin: 20px 0;
-    border-radius: 8px;
-}
-
-/* أضف هذه الأكواد إلى نهاية ملف style.css */
-
+/* --- شريط التنقل (Navbar) --- */
 .navbar {
     display: flex;
     justify-content: center;
@@ -118,83 +102,87 @@ td {
 
 .navbar button {
     width: 150px;
+    height: 40px; /* القيمة الأكبر من الكود السابق */
     background-color: #333;
     color: white;
     border: 1px solid rgb(167, 158, 121);
-}
-
-.navbar button:hover {
-    background-color: rgb(167, 158, 121);
-    color: darkred;
-}
-
-/***************************output and input******************
-/* تنسيق أزرار التنقل لتناسب الطابع العام */
-.navbar button {
-    cursor: pointer;
-    background-color: #333;
-    color: white;
-    border: none;
-    height: 40px;
-    border-radius: 4px;
     transition: 0.3s;
 }
 
 .navbar button:hover {
-    background-color: #147cf3;
+    background-color: #147cf3; /* ميزة اللون الأزرق عند التحويم */
+    color: white;
     letter-spacing: 1px;
 }
 
-div #removeAll {
-    margin: 1px;
+/* --- الجداول (Tables) --- */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 20px 0;
+    border-radius: 8px;
 }
 
-/* /////////////////////// */
-/*******************************************************/
-/*************** Debts**********************************/
-/*******************************************************/
-/* --- تنسيقات قسم المديونيات --- */
+table {
+    width: 100%;
+    text-align: center;
+    margin: 15px 0;
+    border-collapse: collapse;
+}
 
+table th {
+    background-color: #3498db; /* لون قسم الديون المميز */
+    color: white;
+    padding: 8px;
+    text-transform: uppercase;
+}
+
+table td {
+    padding: 10px;
+    border-bottom: 1px solid #444;
+}
+
+table tr:hover {
+    background: #333;
+}
+
+table button {
+    padding: 5px 15px;
+    margin: 2px;
+    border-radius: 4px;
+    font-size: 12px;
+    width: auto !important; 
+    height: auto !important;
+}
+
+tfoot tr {
+    background: #111;
+    font-weight: bold;
+    color: #2ecc71;
+}
+
+#totalAmount {
+    font-size: 1.2rem;
+}
+
+/* --- قسم المديونيات (Debts Section) --- */
 #debtsSection {
     margin-top: 20px;
 }
 
-/* تحسين مدخلات المديونيات لتشبه مدخلات CRUD */
-#debtsSection .input input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    background: #111;
-    border: none;
-    outline: none;
-    color: white;
-    border-radius: 4px;
-    transition: 0.5s;
-}
-
-#debtsSection .input input:focus {
-    transform: scale(1.02);
-}
-
 #debtsSection button {
-    width: 100%;
-    height: 40px;
-    border: none;
-    cursor: pointer;
     background: #3498db;
     color: white;
     border-radius: 20px;
-    transition: 0.5s;
-    font-weight: bold;
+    height: 40px;
 }
 
 #debtsSection button:hover {
     background: #2980b9;
-    letter-spacing: 1px;
 }
 
-/* --- تنسيقات نافذة كشف الحساب (Modal) --- */
-
+/* --- نافذة كشف الحساب (Modal) --- */
 .modal {
     display: none; 
     position: fixed; 
@@ -203,8 +191,8 @@ div #removeAll {
     top: 0;
     width: 100%; 
     height: 100%; 
-    background-color: rgba(0, 0, 0, 0.9); /* خلفية معتمة */
-    backdrop-filter: blur(5px); /* تأثير ضبابي للخلفية */
+    background-color: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(5px);
 }
 
 .modal-content {
@@ -227,10 +215,6 @@ div #removeAll {
     cursor: pointer;
 }
 
-.close-btn:hover {
-    color: #c0392b;
-}
-
 #modalTitle {
     text-align: center;
     color: #3498db;
@@ -238,64 +222,16 @@ div #removeAll {
     font-size: 1.5rem;
 }
 
-
-
-/* تنسيق الجداول داخل المديونات وكشف الحساب */
-table {
-    width: 100%;
-    text-align: center;
-    margin: 15px 0;
-    border-collapse: collapse;
-}
-
-table th {
-    background-color: #3498db;
-    color: white;
-    padding: 3px;
-    text-transform: uppercase;
-}
-
-table td {
-    padding: 10px;
-    border-bottom: 1px solid #444;
-}
-
-table tr:hover {
-    background: #333;
-}
-
-/* أزرار الإجراءات داخل الجدول */
-table button {
-    padding: 5px 15px;
-    margin: 2px;
-    border-radius: 4px;
-    font-size: 12px;
-    width: auto !important; /* لضمان عدم تمددها مثل أزرار الإدخال */
-    height: auto !important;
-}
-
-/* تنسيق تذييل الجدول (الإجمالي) */
-tfoot tr {
-    background: #111;
-    font-weight: bold;
-    color: #2ecc71; /* لون أخضر للمبلغ الإجمالي */
-}
-
-#totalAmount {
-    font-size: 1.2rem;
-}
-#debtDate {
-    color: #4d4b4b;
-}
-
-/* تحسين استجابة الهواتف */
+/* --- استجابة الهواتف (Responsive) --- */
 @media (max-width: 600px) {
+    .crud {
+        width: 95%;
+    }
     .modal-content {
         width: 95%;
         margin: 10% auto;
     }
-    
-    .input-group-modal {
-        flex-direction: column;
+    .price input {
+        width: 45%; /* تحسين الرؤية في الموبايل */
     }
 }

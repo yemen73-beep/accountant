@@ -120,9 +120,10 @@ function showData() {
   let btnDelete = document.getElementById("deleteAll");
   if (dataPro.length > 0) {
     btnDelete.innerHTML = `
-        <button onclick = "deleteAll()">حذف كل السجلات (${dataPro.length})</button>
-        <button onclick="exportToPDF()" style="background-color: #e91e63; margin-top: 10px;">
-        تحميل السجلات PDF</button>`;
+         <button onclick="exportToPDF()" style="background-color: #e91e63; margin-top: 5px;">
+        تحميل السجلات PDF</button>
+        <button onclick = "deleteAll()" style="margin-top: 10px;">حذف كل السجلات (${dataPro.length})</button>
+       `;
   } else {
     btnDelete.innerHTML = " ";
   }
@@ -735,15 +736,31 @@ function closeModal() {
 
 // 9. دالة التنقل بين الأقسام (Show Section)
 function showSection(sectionId) {
-    // إخفاء كل السكاشن (أضف هنا أي ID سكشن آخر لديك)
-    const sections = ['inputSection', 'outputSection', 'debtsSection'];
+    // قائمة بجميع الأقسام الرئيسية في مشروعك
+    const sections = ['inputSection', 'outputSection', 'invoicesSection' , 'debtsSection'];
+    
     sections.forEach(id => {
         const el = document.getElementById(id);
-        if(el) el.style.display = 'none';
+        if (el) el.style.display = 'none'; // إخفاء الكل
     });
-    
-    // إظهار السكشن المطلوب
-    document.getElementById(sectionId).style.display = 'block';
+
+    // إظهار القسم المختار
+    const target = document.getElementById(sectionId);
+    if (target) {
+        target.style.display = 'block';
+    }
+
+    // تحديث البيانات الخاصة بكل قسم عند فتحه
+    if (sectionId === 'invoicesSection') {
+        renderInvoices();
+        updateNextInvDisplay();
+    } else if (sectionId === 'debtsSection') {
+        renderDebtors();
+    } else if (sectionId === 'inputSection') {
+        showData(); // جدول المنتجات
+    } else if (sectionId === 'outputSection') {
+        showOutData(); // جدول المخرجات
+    }
 }
 
 // تحميل البيانات عند تشغيل الصفحة لأول مرة
@@ -854,4 +871,232 @@ function exportDebtorToPDF() {
     };
 
     html2pdf().set(opt).from(element).save();
+}
+
+// الفواتير/************
+// ********************* */
+
+
+let invoices = JSON.parse(localStorage.getItem('invoices_data')) || [];
+let invoiceCounter = parseInt(localStorage.getItem('invoice_counter')) || 1001;
+
+function updateNextInvDisplay() {
+    const display = document.getElementById("nextInvoiceNum");
+    if (display) {
+        display.innerText = "#" + invoiceCounter;
+    }
+}
+
+function addInvoice() {
+    const storeInput = document.getElementById("invStoreName"); // جديد
+    const nameInput = document.getElementById("invCustomerName");
+    const amountInput = document.getElementById("invAmount");
+    const notesInput = document.getElementById("invNotes");
+
+    if (nameInput.value.trim() !== "" && amountInput.value !== "") {
+        const newInvoice = {
+            id: invoiceCounter,
+            storeName: storeInput.value || "إسم المتجر", // حفظ اسم المتجر
+            customer: nameInput.value,
+            amount: parseFloat(amountInput.value).toFixed(2),
+            notes: notesInput.value,
+            date: new Date().toLocaleDateString('en-GB', {
+                year: "numeric",
+                day: "numeric",
+                month: "numeric"
+            }),
+            time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        };
+
+        invoices.push(newInvoice);
+        invoiceCounter++;
+        localStorage.setItem('invoice_counter', invoiceCounter);
+        localStorage.setItem('invoices_data', JSON.stringify(invoices));
+        
+        // تفريغ الحقول بعد الحفظ
+        nameInput.value = "";
+        amountInput.value = "";
+        notesInput.value = "";
+        // ملاحظة: تركت storeInput بدون تفريغ إذا أردت استخدامه للفاتورة التالية بسرعة
+        
+        renderInvoices();
+        updateNextInvDisplay();
+    } else {
+        alert("يرجى إدخال اسم العميل والمبلغ");
+    }
+}
+
+function renderInvoices() {
+    const tbody = document.getElementById("invoicesTableBody");
+    const section = document.getElementById('invoicesSection');
+    const searchTerm = document.getElementById("invoiceSearchInput") ? document.getElementById("invoiceSearchInput").value.toLowerCase() : "";
+    
+    if (!tbody || !section || section.style.display === 'none') return;
+
+    tbody.innerHTML = "";
+
+    // فلترة الفواتير بناءً على اسم العميل أو رقم الفاتورة
+    const filteredInvoices = invoices.filter(inv => {
+        return inv.customer.toLowerCase().includes(searchTerm) || 
+               inv.id.toString().includes(searchTerm);
+    });
+
+    if (filteredInvoices.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">لا توجد نتائج مطابقة للبحث</td></tr>`;
+        return;
+    }
+
+    filteredInvoices.forEach((inv, index) => {
+        // ملاحظة: نستخدم index الأصلي من المصفوفة الأساسية للحذف والطباعة
+        const originalIndex = invoices.findIndex(i => i.id === inv.id);
+
+        tbody.innerHTML += `
+            <tr>
+                <td style="color: #3498db; font-weight: bold;">#${inv.id}</td>
+                <td>
+                    <div>${inv.customer}</div>
+                    <small style="color:#777; font-size:10px;">متجر: ${inv.storeName}</small>
+                </td>
+                <td style="color: #2ecc71; font-weight: bold;">${inv.amount}</td>
+                <td>
+                    <div style="font-size:11px;">${inv.date}</div>
+                    <div style="font-size:9px; color:#aaa;">${inv.time}</div>
+                </td>
+                <td>
+                    <button onclick="printInvoicePDF(${originalIndex})" style="background:#3498db; color:white; border-radius:4px; padding:5px; border:none; cursor:pointer;">PDF 📥</button>
+                    <button onclick="viewInvoiceNotes(${originalIndex})" style="background:#f1c40f; color:black; border-radius:4px; padding:5px; border:none; cursor:pointer;">📝</button>
+                    <button onclick="deleteInvoice(${originalIndex})" style="background:#e74c3c; color:white; border-radius:4px; padding:5px; border:none; cursor:pointer;">حذف</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+function printInvoicePDF(index) {
+    const inv = invoices[index];
+    if (!inv) return;
+
+    const cleanName = inv.customer.replace(/[<>:"/\\|?*]/g, '');
+    const cleanDate = inv.date.replace(/\//g, '-');
+    const fileName = `فاتورة_${cleanName}_${cleanDate}.pdf`;
+
+    const element = document.createElement('div');
+
+    element.innerHTML = `
+    <div style="width:148mm; min-height:210mm; padding:5mm; box-sizing:border-box; background:#fff;">
+        <div dir="rtl" style="width:100%; font-family:'Segoe UI', Arial, sans-serif; background:#fff; border:1px solid #d1d1d1; border-radius:8px; overflow:hidden;">
+
+            <div style="background:linear-gradient(135deg,#1a2a6c,#b21f1f,#fdbb2d);height:8px;"></div>
+
+            <div style="padding:20px;display:flex;justify-content:space-between;align-items:flex-start;background:#fafafa;">
+                <div>
+                    <h1 style="margin:0;color:#1a2a6c;font-size:22px;">فاتورة مبيعات</h1>
+                    <p style="margin:5px 0;font-size:12px;color:#555;">الرقم المرجعي <b style="color:#b21f1f;">#${inv.id}</b></p>
+                </div>
+                <div style="text-align:left;">
+                    <div style="font-weight:bold;font-size:16px;color:#333;">${inv.storeName || "إسم المتجر"}</div>
+                    <div style="font-size:11px;color:#777;margin-top:3px;">${inv.date} | ${inv.time}</div>
+                </div>
+            </div>
+
+            <div style="padding:0 20px;">
+                <div style="background:#fff;border:1px solid #eee;border-radius:6px;padding:12px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <span style="display:block;font-size:10px;color:#aaa;">العميـــل</span>
+                        <span style="font-size:15px;font-weight:bold;color:#333;">${inv.customer}</span>
+                    </div>
+                    <div style="text-align:left;">
+                        <span style="display:block;font-size:10px;color:#aaa;">حالة السداد</span>
+                        <span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:bold;">تم الدفع</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding:0 20px;">
+                <table style="width:100%;border-collapse:collapse;">
+                    <tbody>
+                        <tr>
+                            <td style="padding:12px;font-size:13px;border-bottom:1px solid #f1f1f1;">
+                                <b>خدمات عامة / توريد بضائع</b>
+                                <div style="font-size:11px; color:#888; margin-top:4px;">حسب الطلب المتفق عليه</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top:15px; background:#1a2a6c; color:#fff; display:flex; flex-wrap:wrap; min-height:80px; font-family: Tahoma, Arial, sans-serif; direction: rtl;">
+    <div style="flex: 1; min-width: 65%; padding: 15px 20px; border-left: 1px solid rgba(255,255,255,0.15); display: flex; flex-direction: column;">
+       <div style="direction: rtl; display:flex; align-items:center; gap:5px;">
+            <span>📝</span>
+            <span>ملاحظات</span>
+        </div>
+
+
+        <div style="
+            font-size: 11.5px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+            text-align: right; /* محاذاة النص إلى اليمين للغة العربية */
+            color: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 5px 0;
+            direction: rtl; /* التأكيد على اتجاه النص من اليمين إلى اليسار */
+        ">
+            ${inv.notes || "لا توجد ملاحظات إضافية مسجلة لهذه العملية."}
+        </div>
+    </div>
+
+    <div style="width:120px; padding:15px 20px; display:flex; flex-direction:column; justify-content:center; align-items:center; background:rgba(255,255,255,0.05); font-family: Tahoma, Arial, sans-serif; direction: rtl;">
+        <span style="font-size:11px; opacity:0.8; margin-bottom:5px;">الإجمالي</span>
+        <div style="font-size:20px; font-weight:bold; color:#fdbb2d;">
+            ${inv.amount}
+        </div>
+    </div>
+</div>
+
+
+                <div style="width:120px; padding:15px 20px; display:flex; flex-direction:column; justify-content:center; align-items:center; background:rgba(255,255,255,0.05);">
+                    <span style="font-size:11px; opacity:0.8; margin-bottom:5px;">الإجمالي</span>
+                    <div style="font-size:20px; font-weight:bold; color:#fdbb2d;">
+                        ${inv.amount}
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding:15px; text-align:center; font-size:9px; color:#aaa; background:#fff;">
+                شكراً لتعاملكم مع <b>${inv.storeName || "متجرنا"}</b> —Eng.Ahmed_AlParatY_770049491
+            </div>
+
+        </div>
+    </div>
+    `;
+
+    const opt = {
+        margin: 0,
+        filename: fileName,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            scrollX: 0,
+            scrollY: 0
+        },
+        jsPDF: { 
+            unit: 'mm',
+            format: [148, 210],
+            orientation: 'portrait'
+        }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+
+function deleteInvoice(index) {
+    if (confirm("هل أنت متأكد من حذف هذه الفاتورة؟")) {
+        invoices.splice(index, 1);
+        localStorage.setItem('invoices_data', JSON.stringify(invoices));
+        renderInvoices(); // سيعيد العرض مع الحفاظ على نص البحث
+    }
 }
